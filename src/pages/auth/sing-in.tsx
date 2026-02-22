@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 const signInForm = z.object({
@@ -19,9 +20,20 @@ export function SignIn() {
   } = useForm<SignInForm>();
 
   async function handleSignIn(data: SignInForm) {
-    console.log(data);
+    try {
+      console.log(data);
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      toast.success("enviamos um link de autenticação para seu e-mail.", {
+        action: {
+          label: "Reenviar",
+          onClick: () => handleSignIn(data),
+        },
+      });
+    } catch {
+      toast.error("Credenciais inválidas.");
+    }
   }
 
   return (
@@ -44,7 +56,11 @@ export function SignIn() {
               <Input id="email" type="email" {...register("email")} />
             </div>
 
-            <Button type="submit" className="w-full cursor-pointer" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              className="w-full cursor-pointer"
+              disabled={isSubmitting}
+            >
               Acessar painel
             </Button>
           </form>
