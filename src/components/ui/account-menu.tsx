@@ -11,17 +11,19 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { GetProfile } from "@/api/get-profile";
 import { GetManagedRestaurant } from "@/api/get-managed-restaurant";
+import { Skeleton } from "./skeleton";
 
 export function AccountMenu() {
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading: isLoadingProfile } = useQuery({
     queryKey: ["profile"],
     queryFn: GetProfile,
   });
 
-  const { data: ManagedRestarant } = useQuery({
-    queryKey: ["maneged-restaurant"],
-    queryFn: GetManagedRestaurant,
-  });
+  const { data: ManagedRestarant, isLoading: isLoadingManagedRestaraunt } =
+    useQuery({
+      queryKey: ["maneged-restaurant"],
+      queryFn: GetManagedRestaurant,
+    });
 
   return (
     <DropdownMenu>
@@ -30,17 +32,30 @@ export function AccountMenu() {
           variant="outline"
           className="flex items-center gap-2 select-none"
         >
-          {ManagedRestarant?.name}
+          {isLoadingManagedRestaraunt ? (
+            <Skeleton className="h-4 w-40" />
+          ) : (
+            ManagedRestarant?.name
+          )}
           <ChevronDown className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel className="flex flex-col">
-          <span>Guilherme Silva Evangelista</span>
-          <span className="text-muted-foreground text-xs font-normal">
-            {profile?.email}
-          </span>
+          {isLoadingProfile ? (
+            <div className="space-y-1.5">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+          ) : (
+            <>
+              <span>Guilherme Silva Evangelista</span>
+              <span className="text-muted-foreground text-xs font-normal">
+                {profile?.email}
+              </span>
+            </>
+          )}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
