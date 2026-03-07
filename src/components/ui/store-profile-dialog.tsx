@@ -1,0 +1,79 @@
+import { useQuery } from "@tanstack/react-query";
+import { Button } from "./button";
+import {
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "./dialog";
+import { Input } from "./input";
+import { Label } from "./label";
+import { Textarea } from "./textarea";
+import { GetManagedRestaurant } from "@/api/get-managed-restaurant";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+export function StoreProfileDialog() {
+  const { data: ManagedRestarant } = useQuery({
+    queryKey: ["maneged-restaurant"],
+    queryFn: GetManagedRestaurant,
+  });
+
+  type storeProfileSchemaType = z.infer<typeof storeProfileSchema>;
+
+  const storeProfileSchema = z.object({
+    name: z.string().min(1),
+    description: z.string(),
+  });
+
+  const { register, handleSubmit } = useForm<storeProfileSchemaType>({
+    resolver: zodResolver(storeProfileSchema),
+    values: {
+      name: ManagedRestarant?.name ?? "",
+      description: ManagedRestarant?.description ?? "",
+    },
+  });
+
+  return (
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Perfil da loja</DialogTitle>
+        <DialogDescription>
+          Atualize as informaçẽos do seu estabelecimento visiveis ao seu cliente
+        </DialogDescription>
+      </DialogHeader>
+
+      <form action="">
+        <div className="space-y-4 py-4">
+          <div className="grid-col-4 grid items-center gap-4">
+            <Label className="text-right" htmlFor="name">
+              Nome
+            </Label>
+            <Input className="col-span-3" id="name" {...register("name")} />
+          </div>
+          <div className="grid-col-4 grid items-center gap-4">
+            <Label className="text-right" htmlFor="description">
+              Descrição
+            </Label>
+            <Textarea
+              className="col-span-3"
+              id="description"
+              {...register("description")}
+            />
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="ghost" type="button">
+            Cancelar
+          </Button>
+          <Button type="submit" variant="success">
+            Salvar
+          </Button>
+        </DialogFooter>
+      </form>
+    </DialogContent>
+  );
+}
