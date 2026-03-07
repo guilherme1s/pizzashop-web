@@ -32,7 +32,7 @@ export function StoreProfileDialog() {
 
   const storeProfileSchema = z.object({
     name: z.string().min(1),
-    description: z.string(),
+    description: z.string().nullable(),
   });
 
   type storeProfileSchemaType = z.infer<typeof storeProfileSchema>;
@@ -49,22 +49,38 @@ export function StoreProfileDialog() {
     },
   });
 
+  function updateMangedRestaurantCache({
+    name,
+    description,
+  }: storeProfileSchemaType) {
+    const cached = queryClient.getQueryData<ManagedRestaurantResponse>([
+      "maneged-restaurant",
+    ]);
+
+    if (cached) {
+      queryClient.setQueryData<ManagedRestaurantResponse>(
+        ["maneged-restaurant"],
+        {
+          ...cached,
+          name,
+          description,
+        },
+      );
+    }
+
+    return { cached };
+  }
+
   const { mutateAsync: updateProfileFn } = useMutation({
     mutationFn: UpdateProfile,
-    onSuccess(_, { name, description }) {
-      const cached = queryClient.getQueryData<ManagedRestaurantResponse>([
-        "maneged-restaurant",
-      ]);
+    onMutate({ name, description }) {
+      const { cached } = updateMangedRestaurantCache({ name, description });
 
-      if (cached) {
-        queryClient.setQueryData<ManagedRestaurantResponse>(
-          ["maneged-restaurant"],
-          {
-            ...cached,
-            name,
-            description,
-          },
-        );
+      return { previousProfile: cached };
+    },
+    onError(_error, _variables, context) {
+      if (context?.previousProfile) {
+        updateMangedRestaurantCache(context.previousProfile);
       }
     },
   });
