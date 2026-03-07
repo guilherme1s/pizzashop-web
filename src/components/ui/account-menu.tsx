@@ -19,12 +19,14 @@ export function AccountMenu() {
   const { data: profile, isLoading: isLoadingProfile } = useQuery({
     queryKey: ["profile"],
     queryFn: GetProfile,
+    staleTime: Infinity,
   });
 
   const { data: ManagedRestarant, isLoading: isLoadingManagedRestaraunt } =
     useQuery({
       queryKey: ["maneged-restaurant"],
       queryFn: GetManagedRestaurant,
+      staleTime: Infinity,
     });
 
   return (
