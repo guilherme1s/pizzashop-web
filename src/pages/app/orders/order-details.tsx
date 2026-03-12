@@ -65,7 +65,7 @@ export function OrderDetails({ orderId, open }: OrderDetailsProps) {
                   Telefone
                 </TableCell>
                 <TableCell className="flex justify-end">
-                  {order.customer.phone ?? 'Não informado'}
+                  {order.customer.phone ?? "Não informado"}
                 </TableCell>
               </TableRow>
 
