@@ -5,23 +5,13 @@ import {
   Pie,
   Sector,
   type PieLabelRenderProps,
+  type SectorProps,
 } from "recharts";
 import { BarChart } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-type Product = {
-  products: string;
-  amount: number;
-};
-
-const data: Product[] = [
-  { products: "Pepperoni", amount: 40 },
-  { products: "Mussarela", amount: 10 },
-  { products: "Marguerita", amount: 16 },
-  { products: "Calabresa", amount: 12 },
-  { products: "4 Queijos", amount: 20 },
-];
+import { useQuery } from "@tanstack/react-query";
+import { getPopularProducts } from "@/api/get-popular-products";
 
 const COLORS = [
   colors.sky[500],
@@ -31,7 +21,17 @@ const COLORS = [
   colors.rose[500],
 ];
 
+type PopularProduct = {
+  product: string;
+  amount: number;
+};
+
 export function PopularProductsChart() {
+  const { data: popularProducts } = useQuery<PopularProduct[]>({
+    queryKey: ["metrics", "popular-products"],
+    queryFn: getPopularProducts,
+  });
+
   const renderLabel = ({
     cx = 0,
     cy = 0,
@@ -43,9 +43,11 @@ export function PopularProductsChart() {
   }: PieLabelRenderProps) => {
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.9 + 10;
+
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
-    const name = payload?.products ?? "";
+
+    const name = (payload as PopularProduct)?.product ?? "";
 
     return (
       <text
@@ -60,8 +62,9 @@ export function PopularProductsChart() {
     );
   };
 
-  const renderShape = (props: any) => {
+  const renderShape = (props: SectorProps & { index?: number }) => {
     const { index = 0 } = props;
+
     return (
       <Sector
         {...props}
@@ -83,23 +86,25 @@ export function PopularProductsChart() {
       </CardHeader>
 
       <CardContent>
-        <ResponsiveContainer width="100%" height={240}>
-          <PieChart style={{ fontSize: 12 }}>
-            <Pie
-              data={data}
-              dataKey="amount"
-              nameKey="products"
-              cx="50%"
-              cy="50%"
-              outerRadius={86}
-              innerRadius={64}
-              strokeWidth={8}
-              label={renderLabel}
-              shape={renderShape}
-              labelLine={false}
-            />
-          </PieChart>
-        </ResponsiveContainer>
+        {popularProducts && (
+          <ResponsiveContainer width="100%" height={240}>
+            <PieChart style={{ fontSize: 12 }}>
+              <Pie
+                data={popularProducts}
+                dataKey="amount"
+                nameKey="product"
+                cx="50%"
+                cy="50%"
+                outerRadius={86}
+                innerRadius={64}
+                strokeWidth={8}
+                label={renderLabel}
+                shape={renderShape}
+                labelLine={false}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        )}
       </CardContent>
     </Card>
   );
