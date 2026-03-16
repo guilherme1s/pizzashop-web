@@ -19,6 +19,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { getDailyRevenueInPeriod } from "@/api/get-daily-revenue-in-period";
 import { useMemo } from "react";
+import { Loader2 } from "lucide-react";
 
 export function RevenueChart() {
   const { data: dailyRevenueInPeriod } = useQuery({
@@ -26,14 +27,14 @@ export function RevenueChart() {
     queryFn: getDailyRevenueInPeriod,
   });
 
-	const chartData = useMemo(() => {
-		return dailyRevenueInPeriod?.map((chartItem) => {
-			return {
-				date: chartItem.date,
-				receipt: chartItem.receipt / 100,
-			}
-		});
-	}, [dailyRevenueInPeriod]);
+  const chartData = useMemo(() => {
+    return dailyRevenueInPeriod?.map((chartItem) => {
+      return {
+        date: chartItem.date,
+        receipt: chartItem.receipt / 100,
+      };
+    });
+  }, [dailyRevenueInPeriod]);
 
   return (
     <Card className="col-span-6">
@@ -47,7 +48,7 @@ export function RevenueChart() {
       </CardHeader>
 
       <CardContent>
-        {chartData && (
+        {chartData ? (
           <ResponsiveContainer width="100%" height={240}>
             <LineChart data={chartData} style={{ fontSize: 12 }}>
               <XAxis dataKey="date" tickLine={false} axisLine={false} dy={16} />
@@ -74,6 +75,10 @@ export function RevenueChart() {
               />
             </LineChart>
           </ResponsiveContainer>
+        ) : (
+          <div className="flex h-60 w-full items-center justify-center">
+            <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+          </div>
         )}
       </CardContent>
     </Card>
