@@ -18,27 +18,30 @@ export function MonthOrdersAmountCard() {
       </CardHeader>
 
       <CardContent className="space-y-1">
-        {monthOrdersAmount ? (
+        {monthOrdersAmount && typeof monthOrdersAmount.amount === "number" ? (
           <>
             <span className="text-2xl font-bold tracking-tight">
               {monthOrdersAmount.amount.toLocaleString("pt-BR")}
             </span>
 
             <p className="text-muted-foreground text-sm">
-              {monthOrdersAmount.diffFromLastMonth >= 0 ? (
+              {typeof monthOrdersAmount.diffFromLastMonth === "number" &&
+              monthOrdersAmount.diffFromLastMonth >= 0 ? (
                 <>
                   <span className="text-emerald-500 dark:text-emerald-400">
                     +{monthOrdersAmount.diffFromLastMonth}%
                   </span>{" "}
                   em relação ao mês passado
                 </>
-              ) : (
+              ) : typeof monthOrdersAmount.diffFromLastMonth === "number" ? (
                 <>
                   <span className="text-rose-500 dark:text-rose-400">
                     {monthOrdersAmount.diffFromLastMonth}%
                   </span>{" "}
                   em relação ao mês passado
                 </>
+              ) : (
+                ""
               )}
             </p>
           </>
