@@ -55,7 +55,7 @@ export function AccountMenu() {
               </div>
             ) : (
               <>
-                <span>Guilherme Silva Evangelista</span>
+                <span>{profile?.name}</span>
                 <span className="text-muted-foreground text-xs font-normal">
                   {profile?.email}
                 </span>
